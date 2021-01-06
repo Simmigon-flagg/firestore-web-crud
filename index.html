@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+
+    <script src="./config.js"></script>
+    <script>
+      const users = {
+        first: "John",
+        last: "Snow",
+        born: 1812,
+        matches: [],
+      };
+      //   CRUD
+      // 1. Create
+      // 2. Read
+      // 3. Update
+      // 4. Delete
+
+      //   Create New User
+      const addUser = (users) => {
+        db.collection("users")
+          .add({
+            first: users.first,
+            last: users.last,
+            born: users.born,
+            matches: users.matches,
+          })
+          .then(function (docRef) {
+            console.log("Document written with ID: ", docRef.id);
+          })
+          .catch(function (error) {
+            console.error("Error adding document: ", error);
+          });
+      };
+
+      //   Read a User Single Users
+      const readUser = (id) => {
+        var singleUser = db.collection("users").doc(id);
+        singleUser
+          .get()
+          .then(function (doc) {
+            if (doc.exists) {
+              console.log(
+                `Found: ${doc.id} => ${JSON.stringify(doc.data(), null, 2)}`
+              );
+            } else {
+              // doc.data() will be undefined in this case
+              console.log("No such document!");
+            }
+          })
+          .catch(function (error) {
+            console.log("Error getting document:", error);
+          });
+      };
+
+      //   Update a User Single Users
+      const updateUser = (id) => {
+        // Add a new document in collection "cities"
+        // const user = readUser(id);
+        var updateSingle = db.collection("users").doc(id);
+        var setWithMerge = updateSingle.set(
+          {
+            city: "Duluth, Ga",
+          },
+          { merge: true }
+        );
+        console.log("Set With Merge" + JSON.stringify(setWithMerge));
+      };
+
+      //   Delete a User Single Users
+      const deleteUser = (id) => {
+        console.log(id);
+        var singleUser = db.collection("users").doc(id);
+        // Remove the 'field of your choice' field from the document
+        var removeMatches = singleUser.update({
+          matches: firebase.firestore.FieldValue.delete(),
+        });
+      };
+
+      //   Read all User Single Users
+      const readAll = () => {
+        db.collection("users")
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              console.log(
+                `${doc.id} => ${JSON.stringify(doc.data(), null, 2)}`
+              );
+            });
+          });
+      };
+      // Read All readAll();
+      // Create: addUser(users);
+      // Read: readUser("6J1hZXAyS3nJqaz30YBH");
+      // Update: updateUser("VKI6eXViyjyinaY3VdXC");
+      // Delete: deleteUser("VKI6eXViyjyinaY3VdXC");
+
+
+      //   Update a User Single Users
+      const likedUsers = (id, potentialMatch) => {
+        // Add a new document in collection "cities"
+        // const user = readUser(id);
+        var updateSingle = db.collection("users").doc(id);
+        const matches = {};
+        matches[potentialMatch] = false;
+        var setWithMerge = updateSingle.set(
+          {
+            matches,
+          },
+          { merge: true }
+        );
+        console.log("Set With Merge" + JSON.stringify(setWithMerge));
+      };
+      
+      const currentUser ="VKI6eXViyjyinaY3VdXC";
+      const matchedUser ="6J1hZXAyS3nJqaz30YBH";
+
+      likedUsers(currentUser, matchedUser);
+    </script>
+  </body>
+</html>
